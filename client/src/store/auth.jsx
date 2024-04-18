@@ -6,8 +6,13 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
 	const [token, setToken] = useState(localStorage.getItem("token"));
 	const [user, setUser] = useState("");
+	const [isLoading, setIsLoading] = useState(true);
+	const [services, setServices] = useState("");
+	const authorizationToken = `Bearer ${token}`;
+
 	//function to stored the token in local storage
 	const storeTokenInLS = (serverToken) => {
+		setToken(serverToken);
 		return localStorage.setItem("token", serverToken);
 	};
 
@@ -20,10 +25,11 @@ export const AuthProvider = ({ children }) => {
 
 	const userAuthentication = async () => {
 		try {
+			setIsLoading(true);
 			const response = await fetch("http://localhost:5020/api/auth/user", {
 				method: "GET",
 				headers: {
-					Authorization: `Bearer ${token}`,
+					Authorization: authorizationToken,
 				},
 			});
 
@@ -31,19 +37,46 @@ export const AuthProvider = ({ children }) => {
 				const data = await response.json();
 				console.log("user-data", data.userData);
 				setUser(data.userData);
+				setIsLoading(false);
+			} else {
+				setIsLoading(false);
 			}
 		} catch (error) {
 			console.log("Error fetching user data");
 		}
 	};
 
+	const getServices = async () => {
+		try {
+			const response = await fetch("http://localhost:5020/api/data/service", {
+				method: "GET",
+			});
+			if (response.ok) {
+				const data = await response.json();
+				console.log(data.msg);
+				setServices(data.msg);
+			}
+		} catch (error) {
+			console.log(`Services frontend error ${error}`);
+		}
+	};
+
 	useEffect(() => {
 		userAuthentication();
+		getServices();
 	}, []);
 
 	return (
 		<AuthContext.Provider
-			value={{ isLoggedIn, storeTokenInLS, LogoutUser, user }}>
+			value={{
+				isLoggedIn,
+				storeTokenInLS,
+				LogoutUser,
+				user,
+				services,
+				authorizationToken,
+				isLoading,
+			}}>
 			{children}
 		</AuthContext.Provider>
 	);

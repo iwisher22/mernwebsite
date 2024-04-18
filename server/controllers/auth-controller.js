@@ -11,12 +11,13 @@ const home = async (req, res) => {
 
 const register = async (req, res) => {
 	try {
+		console.log(req.body);
 		const { username, email, phone, password } = req.body;
 
-		const userExist = await User.findOne({ email: email });
+		const userExist = await User.findOne({ email });
 
 		if (userExist) {
-			return res.json(400).json({ mes: "email already exist" });
+			return res.status(400).json({ message: "email already exist" });
 		}
 
 		// const saltRound = 10;
@@ -46,7 +47,7 @@ const login = async (req, res) => {
 		const userExist = await User.findOne({ email });
 
 		if (!userExist) {
-			return res.json(400).json({ message: "Invalid Crendtials" });
+			return res.status(400).json({ message: "Invalid Crendtials" });
 		}
 
 		// const user = await bcrypt.compare(password, userExist.password);

@@ -9,7 +9,7 @@ export const Navbar = () => {
 			<header>
 				<div className="container">
 					<div className="logo-brand">
-						<a href="/">Ashu hero</a>
+						<a href="/">Ashu Techical</a>
 					</div>
 					<nav>
 						<ul>
